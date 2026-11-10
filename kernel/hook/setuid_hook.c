@@ -21,6 +21,9 @@ static __always_inline void ksu_handle_setresuid_cred(struct cred *new, const st
 	if (ksu_is_allow_uid_for_current(new_uid))
 		goto kill_seccomp;
 
+	// SuSFS marks, before (and independent of) the umount below
+	ksu_susfs_handle_setresuid(old, new_uid);
+
 	// Handle kernel umount
 	ksu_handle_umount(new, old);
 	return;

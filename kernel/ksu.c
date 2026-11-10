@@ -142,6 +142,7 @@
 #include "feature/shell_su_adb_only.c"
 #include "feature/sucompat.c"
 #include "feature/sulog.c"
+#include "feature/susfs_integration.c"
 #include "runtime/boot_event.c"
 #include "runtime/ksud_integration.c"
 
@@ -323,6 +324,7 @@ static int __init kernelsu_lkm_init(void)
 	stop_init_rc_hook();
 	apply_kernelsu_rules();
 	cache_sid();
+	ksu_susfs_cache_sid();
 	setup_ksu_cred();
 	escape_to_root_forced();
 

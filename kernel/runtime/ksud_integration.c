@@ -335,6 +335,7 @@ static noinline void ksu_install_rc_hook(struct file *file)
 	pr_info("%s: init.rc second stage, fp: 0x%lx \n", __func__, (uintptr_t)file);
 	apply_kernelsu_rules();
 	cache_sid();
+	ksu_susfs_cache_sid();
 	setup_ksu_cred();
 	ksu_grab_init_session_keyring();
 	ksu_feature_apply_forced();
