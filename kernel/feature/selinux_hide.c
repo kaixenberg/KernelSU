@@ -348,9 +348,13 @@ init_hooks:; // apply_kernelsu_rules_fn
 	const char *init_adb_args[] = { "init", "adb_data_file", NULL };
 	ksu_add_shit_to_list(KSU_SEPOLICY_CMD_NORMAL_PERM, init_adb_args);
 
-	// we move this to a module instead
-	// const char *adbroot_args[] = { "adbroot", NULL };
-	// ksu_add_shit_to_list(KSU_SEPOLICY_CMD_TYPE, adbroot_args);
+	// NidhiKernel: hide the adbroot domain here rather than from a module.
+	// ROMs declare it in system_ext policy without shipping adb_root, and
+	// detectors probe u:r:adbroot:s0 and adbd -> adbroot as an adb root
+	// tell. Matching is on ":adbroot:", so adbroot_exec / _data_file /
+	// _service labels keep resolving.
+	const char *adbroot_args[] = { "adbroot", NULL };
+	ksu_add_shit_to_list(KSU_SEPOLICY_CMD_TYPE, adbroot_args);
 
 	int tries = 0;
 try_again:
