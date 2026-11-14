@@ -427,8 +427,19 @@ static __always_inline void ksu_sucompat_kernel_execve(int *restrict fd, void **
 
 	write_sulog('x');
 	ksu_sulog_emit_sucompat_post(*filename_ptr, nullptr, u_argv);
-	if (!ksyscall_execve_ksud(function_name, u_argv, u_envp))
+	if (!ksyscall_execve_ksud(function_name, u_argv, u_envp)) {
+		/*
+		 * NidhiKernel: ksud already replaced this image, but the caller
+		 * still runs the original execve afterwards. Upstream expects
+		 * SU_PATH to be missing; ROMs that ship /system/bin/su would
+		 * exec it over ksud with argv pointers into ksud's new mm.
+		 * Point it at a path that fails in do_open_execat, before argv
+		 * is read.
+		 */
+		constexpr char none[16] = "/dev/null/ksud";
+		memcpy_inline(*filename_ptr, none, sizeof(none));
 		return;
+	}
 
 	// failure path
 	pr_info("su_compat: %s su->sh!%s\n", function_name, (is_compat_task()) ? " [compat]" : "" );
