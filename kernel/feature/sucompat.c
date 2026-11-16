@@ -68,8 +68,11 @@ static __always_inline bool is_su_allowed(const void **ptr_to_check)
 	if (likely(ksu_is_seccomp_enabled()))
 		return false;
 
-	// pass through tagged task from setuid hook
-	if (test_thread_flag(TIF_KSU_MANAGED))
+	// pass through tagged task from setuid hook.
+	// Not for shell: the tag is set when adbd drops to shell and is
+	// inherited across fork, while shell_su_adb_only depends on the
+	// current process tree (e.g. a server that left the adb session).
+	if (test_thread_flag(TIF_KSU_MANAGED) && likely(current_uid().val != SHELL_UID))
 		goto check_ptr;
 
 #ifdef CONFIG_KSU_ENABLE_FULL_UID_CHECKS
