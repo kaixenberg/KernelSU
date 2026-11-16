@@ -21,6 +21,9 @@
  * reuses code from: https://github.com/tiann/KernelSU/blob/v1.0.5/kernel/core_hook.c#L188
  */
 
+// defined in feature/susfs_integration.c, later in this unit
+static void ksu_susfs_on_packages_changed(void);
+
 static void *system_dir_inode_ptr = nullptr;
 
 static noinline void ksu_grab_data_system_inode()
@@ -53,6 +56,7 @@ static noinline void ksu_rename_observer_slow(struct dentry *old_dentry, struct 
 
 	pr_info("renameat: %s -> %s, new path: %s\n", old_dentry->d_iname, new_dentry->d_iname, buf);
 	track_throne(false);
+	ksu_susfs_on_packages_changed();
 	return;
 }
 
@@ -102,6 +106,7 @@ static inline void ksu_rename_observer(struct dentry *old_dentry, struct dentry 
 
 	pr_info("renameat: %s -> %s, /data/system d_inode: 0x%lx \n", old_dentry->d_iname, new_dentry->d_iname, system_dir_inode_ptr);
 	track_throne(false);
+	ksu_susfs_on_packages_changed();
 	return;
 
 slow_path:

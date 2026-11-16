@@ -109,10 +109,22 @@ static void ksu_susfs_on_boot_completed(void)
 	susfs_start_sdcard_monitor_fn();
 }
 
+// App uids change on reinstall: resolve the package-name filters again
+static void ksu_susfs_on_packages_changed(void)
+{
+#ifdef CONFIG_KSU_SUSFS_PRIORITY_UID_FILTER
+	susfs_parse_priority_app_strings();
+#endif
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	susfs_parse_sus_path_app_strings();
+#endif
+}
+
 #else /* !CONFIG_KSU_SUSFS */
 
 static inline void ksu_susfs_cache_sid(void) { }
 static inline void ksu_susfs_handle_setresuid(const struct cred *old, uid_t new_uid) { }
 static inline void ksu_susfs_on_boot_completed(void) { }
+static inline void ksu_susfs_on_packages_changed(void) { }
 
 #endif /* CONFIG_KSU_SUSFS */
